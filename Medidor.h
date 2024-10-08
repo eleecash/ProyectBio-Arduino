@@ -1,33 +1,64 @@
-// -- mode: c++ --
+/*
+ * Nombre del fichero: Medidor.h
+ * Descripción: Definición de la clase Medidor para medir gas y temperatura.
+ * Autores: Carla Rumeu Montesinos y Elena Ruiz de la Blanca
+ * Fecha: 30 de septiembre de 2024
+ *
+ * Este archivo ha sido realizado por Carla Rumeu Montesinos y Elena Ruiz de la Blanca el 30 de septiembre de 2024.
+ * Contiene la implementación de la clase Medidor, que permite medir la concentración de ozono en partes por millón (ppm) 
+ * y proporciona un método de ejemplo para medir la temperatura.
+ * 
+ * Todos los derechos reservados.
+ */
+
 #ifndef MEDIDOR_H_INCLUIDO
 #define MEDIDOR_H_INCLUIDO
 
 #include <Arduino.h> // Incluir la librería de Arduino para funciones como analogRead, pinMode, etc.
 
-// ------------------------------------------------------
-// Clase Medidor para medir gas y temperatura
-// ------------------------------------------------------
+/**
+ * ------------------------------------------------------
+ * Clase Medidor para medir gas y temperatura
+ * 
+ * Esta clase permite medir la concentración de ozono en partes por millón (ppm) 
+ * y proporciona un método de ejemplo para medir la temperatura.
+ * ------------------------------------------------------
+ */
 class Medidor {
 
 private:
-    uint8_t pinVref;    // Pin para referencia de voltaje
-    uint8_t pinVgas;    // Pin para leer el voltaje del gas
-    double ppmOzono;    // Partes por millón de Ozono (O3)
-    float vref;         // Voltaje de referencia
-    float vgas;         // Voltaje del gas
+    uint8_t pinVref;    ///< Pin para referencia de voltaje.
+    uint8_t pinVgas;    ///< Pin para leer el voltaje del gas.
+    double ppmOzono;    ///< Partes por millón de Ozono (O3).
+    float vref;         ///< Voltaje de referencia.
+    float vgas;         ///< Voltaje del gas.
 
-    // Función para convertir valor digital a voltios
+    /**
+     * ------------------------------------------------------
+     * Convierte un valor digital a voltios.
+     * 
+     * @param Vin Valor digital a convertir.
+     * @return Valor en voltios.
+     */
     float digToVolt(int Vin) { 
         return ((Vin * 3.3) / 1024);
     }
-
-    // Función para realizar una calibración lineal
-    // Esta función toma el valor medido y ajusta la lectura usando una recta
-    // y = m * x + b, donde m es la pendiente y b es la intersección
+    
+    /**
+     * ------------------------------------------------------
+     * Realiza una calibración lineal de la lectura.
+     * 
+     * Esta función toma el valor medido y ajusta la lectura usando 
+     * una recta y = m * x + b, donde m es la pendiente y b es la intersección.
+     * 
+     * @param valorMedido Valor medido a calibrar.
+     * @param m Referencia a la pendiente (se modifica).
+     * @return Valor calibrado.
+     */
     double calibrarLectura(double valorMedido, double &m) {
         // Ajuste manual basado en los datos proporcionados por las pruebas
-        m = 0.3; // Pendiente de la recta, ajustar según sea necesario
-        const double b = -1.5; // Intersección de la recta, ajustar según sea necesario
+        m = 0.3;  ///< Pendiente de la recta, ajustar según sea necesario.
+        const double b = -1.5; ///< Intersección de la recta, ajustar según sea necesario.
         double valorCalibrado = m * valorMedido + b; // Calcula el valor calibrado
 
         // Si el valor calibrado es negativo, devuelve 0
@@ -41,7 +72,11 @@ public:
 
     }
 
-    // Constructor
+    /**
+     * Constructor
+     * @param pinVgas Pin para leer el voltaje del gas.
+     * @param pinVref Pin para referencia de voltaje.
+     */
     Medidor(uint8_t pinVgas, uint8_t pinVref)
         : pinVref(pinVref), pinVgas(pinVgas), ppmOzono(0), vref(0), vgas(0) {
     }
@@ -55,7 +90,11 @@ public:
         pinMode(pinVgas, INPUT);
     }
 
-    // Mide el gas y devuelve el valor de ppm de ozono calibrado
+    /**
+     * Mide el gas y devuelve el valor de ppm de ozono calibrado
+     * 
+     * @return Valor calibrado de ppm de ozono.
+     */
     double medirGas() {
         // Lee el valor de los pines del sensor
         int Agas = analogRead(pinVgas);
@@ -97,7 +136,11 @@ public:
         return ppmCalibrado; // Devuelve el valor calibrado
     }
 
-    // Función de ejemplo para medir la temperatura
+    /**
+     * Función de ejemplo para medir la temperatura
+     * 
+     * @return Valor simulado de temperatura (cambiar según el sensor de temperatura).
+     */
     int medirTemperatura() {
         return -12; // Ejemplo, cambiar según el sensor de temperatura
     }

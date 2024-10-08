@@ -1,9 +1,13 @@
-// -*- mode: c++ -*-
-
-// ----------------------------------------------------------
-// Jordi Bataller i Mascarell
-// 2019-07-07
-// ----------------------------------------------------------
+/*
+ * Nombre del fichero: Emisora.h
+ * Descripción: Definición de la clase EmisoraBLE para gestionar la emisora Bluetooth de tipo BLE.
+ * Autores: Carla Rumeu Montesinos y Elena Ruiz de la Blanca
+ * Fecha: 3o de septiembre de 2024
+ *
+ * Este archivo ha sido realizado por Carla Rumeu Montesinos y Elena Ruiz de la Blanca el 30 de septiembre de 2024.
+ * Contiene la implementación de la clase EmisoraBLE, que permite la configuración del nombre, 
+ * el ID del fabricante y la potencia de transmisión de una emisora BLE.
+ */
 #ifndef EMISORA_H_INCLUIDO
 #define EMISORA_H_INCLUIDO
 
@@ -18,26 +22,58 @@
 
 // ----------------------------------------------------------
 // ----------------------------------------------------------
+
+/**
+ * @brief Clase para gestionar la emisora Bluetooth de tipo BLE (Bluetooth Low Energy).
+ * 
+ * Esta clase encapsula las funcionalidades de la emisora BLE, permitiendo la configuración
+ * del nombre, el ID del fabricante y la potencia de transmisión. Además, permite iniciar
+ * la emisión de anuncios y gestionar conexiones.
+ * 
+ * @section diseño Diseño
+ * Esta clase utiliza la biblioteca Bluefruit para interactuar con el hardware BLE. 
+ * Implementa métodos para encender la emisora, emitir anuncios iBeacon y gestionar 
+ * servicios y características asociadas.
+ * 
+ * @section ejemplos Ejemplo de uso
+ * @code
+ * EmisoraBLE emisora("MiEmisora", 0x4C00, 0xCA);
+ * emisora.encenderEmisora();
+ * @endcode
+ */
+
 #include "ServicioEnEmisora.h"
 
 // ----------------------------------------------------------
-// ----------------------------------------------------------
+/**
+ * @class EmisoraBLE
+ * @brief Clase para manejar una emisora BLE (Bluetooth Low Energy).
+ */
 class EmisoraBLE {
 private:
 
-  const char * nombreEmisora;
-  const uint16_t fabricanteID;
-  const int8_t txPower;
-
+    const char * nombreEmisora; ///< Nombre de la emisora BLE.
+    const uint16_t fabricanteID; ///< ID del fabricante de la emisora.
+    const int8_t txPower;        ///< Potencia de transmisión en dBm.
 public:
 
   // .........................................................
-  // .........................................................
+  /// @brief Tipo de callback para conexión establecida.
   using CallbackConexionEstablecida = void ( uint16_t connHandle );
+
+  /// @brief Tipo de callback para conexión terminada.
   using CallbackConexionTerminada = void ( uint16_t connHandle, uint8_t reason);
 
-  // .........................................................
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Constructor de la clase EmisoraBLE.
+     * 
+     * Este constructor inicializa los parámetros de la emisora.
+     * 
+     * @param nombreEmisora_ Nombre de la emisora.
+     * @param fabricanteID_ ID del fabricante.
+     * @param txPower_ Potencia de transmisión.
+     */
   EmisoraBLE( const char * nombreEmisora_, const uint16_t fabricanteID_,const int8_t txPower_ ):
 	nombreEmisora( nombreEmisora_ ) ,
 	fabricanteID( fabricanteID_ ) ,
@@ -68,8 +104,13 @@ public:
   } // ()
   */
 	
-  // .........................................................
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Enciende la emisora BLE.
+     * 
+     * Inicializa la emisora y detiene cualquier anuncio previo.
+     * @return void
+     */
   void encenderEmisora() {
 	// Serial.println ( "Bluefruit.begin() " );
 	 Bluefruit.begin(); 
@@ -78,8 +119,14 @@ public:
 	 (*this).detenerAnuncio();
   } // ()
 
-  // .........................................................
-  // .........................................................
+ // ......................................................... 
+    /**
+     * @brief Enciende la emisora y establece callbacks.
+     * 
+     * @param cbce Callback que se ejecuta cuando se establece una conexión.
+     * @param cbct Callback que se ejecuta cuando se termina una conexión.
+     * @return void
+     */
   void encenderEmisora( CallbackConexionEstablecida cbce,
 						CallbackConexionTerminada cbct ) {
 
@@ -90,8 +137,13 @@ public:
 
   } // ()
 
-  // .........................................................
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Detiene la emisión de anuncios.
+     * 
+     * Si la emisora está actualmente anunciando, se detiene el anuncio.
+     * @return void
+     */
   void detenerAnuncio() {
 
 	if ( (*this).estaAnunciando() ) {
@@ -101,15 +153,26 @@ public:
 
   }  // ()
   
-  // .........................................................
-  // estaAnunciando() -> Boleano
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Verifica si la emisora está anunciando.
+     * 
+     * @return true si está anunciando, false en caso contrario.
+     */
   bool estaAnunciando() {
 	return Bluefruit.Advertising.isRunning();
   } // ()
 
-  // .........................................................
-  // .........................................................
+// ......................................................... 
+    /**
+     * @brief Emite un anuncio de tipo iBeacon.
+     * 
+     * @param beaconUUID Puntero al UUID del beacon.
+     * @param major Número mayor del beacon.
+     * @param minor Número menor del beacon.
+     * @param rssi Potencia de la señal recibida.
+     * @return void
+     */
   void emitirAnuncioIBeacon( uint8_t * beaconUUID, int16_t major, int16_t minor, uint8_t rssi ) {
 
 	//
@@ -198,6 +261,18 @@ public:
 
 	const uint8_t tamanyoCarga = strlen( carga );
   */
+
+
+  // ......................................................... 
+    /**
+     * @brief Emite un anuncio de tipo iBeacon con carga libre.
+     * 
+     * Permite enviar una carga personalizada como parte del anuncio iBeacon.
+     * 
+     * @param carga Puntero a la carga a enviar.
+     * @param tamanyoCarga Tamaño de la carga a enviar.
+     * @return void
+     */
   void emitirAnuncioIBeaconLibre( const char * carga, const uint8_t tamanyoCarga ) {
 
 	(*this).detenerAnuncio(); 
@@ -256,8 +331,13 @@ public:
 	Globales::elPuerto.escribir( "emitiriBeacon libre  Bluefruit.Advertising.start( 0 );  \n");
   } // ()
 
-  // .........................................................
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Añade un servicio a la emisora.
+     * 
+     * @param servicio Referencia al servicio a añadir.
+     * @return true si se añadió correctamente, false en caso contrario.
+     */
   bool anyadirServicio( ServicioEnEmisora & servicio ) {
 
 	Globales::elPuerto.escribir( " Bluefruit.Advertising.addService( servicio ); \n");
@@ -274,14 +354,27 @@ public:
 	 // para addService()
   } // ()
 
-  
-  // .........................................................
-  // .........................................................
+// ......................................................... 
+    /**
+     * @brief Añade un servicio y sus características a la emisora.
+     * 
+     * @param servicio Referencia al servicio a añadir.
+     * @return true si se añadió correctamente, false en caso contrario.
+     */
   bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio ) { 
 	return (*this).anyadirServicio( servicio );
   } // 
 
-  // .........................................................
+  // ......................................................... 
+    /**
+     * @brief Añade un servicio y múltiples características a la emisora.
+     * 
+     * @tparam T Parámetros de tipo variable para características.
+     * @param servicio Referencia al servicio a añadir.
+     * @param caracteristica Referencia a la característica a añadir.
+     * @param restoCaracteristicas Referencias a las características adicionales.
+     * @return true si se añadieron correctamente, false en caso contrario.
+     */
   template <typename ... T>
   bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio,ServicioEnEmisora::Caracteristica & caracteristica, T& ... restoCaracteristicas) {
 
@@ -292,6 +385,18 @@ public:
   } // ()
 
   // .........................................................
+    /** 
+     * @brief Añade un servicio con sus características y lo activa.
+     * Esta función permite añadir un servicio especificando sus características 
+     * y lo activa una vez añadido.
+     * @tparam T Tipos de las características a añadir.
+     * @param servicio Referencia al servicio que se va a añadir.
+     * @param restoCaracteristicas Referencia a las características adicionales
+     * a añadir al servicio.
+     * @return Devuelve true si el servicio se añadió correctamente, 
+     * false en caso contrario.
+     */
+
   template <typename ... T>
   bool anyadirServicioConSusCaracteristicasYActivar( ServicioEnEmisora & servicio,
 													 // ServicioEnEmisora::Caracteristica & caracteristica,
@@ -306,19 +411,37 @@ public:
   } // ()
 
   // .........................................................
-  // .........................................................
+    /**
+     * @brief Instala un callback para la conexión establecida.
+     * Esta función permite establecer un callback que se llamará 
+     * cuando se establezca una conexión.
+     * @param cb Callback que se invocará al establecer la conexión.
+     */
+
   void instalarCallbackConexionEstablecida( CallbackConexionEstablecida cb ) {
 	Bluefruit.Periph.setConnectCallback( cb );
   } // ()
-
+  
   // .........................................................
-  // .........................................................
+    /**
+     * @brief Instala un callback para la conexión terminada.
+     * Esta función permite establecer un callback que se llamará 
+     * cuando se termine una conexión.
+     * @param cb Callback que se invocará al terminar la conexión.
+     */
+     
   void instalarCallbackConexionTerminada( CallbackConexionTerminada cb ) {
 	Bluefruit.Periph.setDisconnectCallback( cb );
   } // ()
 
   // .........................................................
-  // .........................................................
+    /**
+     * @brief Obtiene la conexión correspondiente a un identificador.
+     * Esta función permite obtener un puntero a la conexión utilizando
+     * el manejador de conexión especificado.
+     * @param cb connHandle Manejador de conexión del cual se quiere obtener la conexión.
+     * @return Puntero a la conexión correspondiente.
+     */
   BLEConnection * getConexion( uint16_t connHandle ) {
 	return Bluefruit.Connection( connHandle );
   } // ()
