@@ -61,6 +61,7 @@ namespace Globales {
  * 
  * @return No devuelve ningún valor.
  */
+
 void inicializarPlaquita () {
 
   // de momento nada
@@ -74,6 +75,8 @@ void inicializarPlaquita () {
  * para el funcionamiento del sistema.
  * return No devuelve ningún valor.
  */
+
+
 void setup() {
   Globales::elPuerto.esperarDisponible(); // Espera a que el puerto esté disponible
 
